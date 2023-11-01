@@ -1,15 +1,14 @@
 from models.student import Student
+from models.login_credentials import LoginCredentials
 from utilities.databases import *
 from fastapi import FastAPI, HTTPException, Depends
 
 app = FastAPI()
 
-@app.post('/api/login')
-async def verify_login(username: str, password: str, db: Session = Depends(get_db)):
-    user = db.query(Student).filter(Student.Name == username, Student.Password == password).first()
+@app.post('/login')
+async def verify_login(credentials: LoginCredentials, db: Session = Depends(get_db)):
+    user = db.query(Student).filter(Student.Email == credentials.email, Student.Password == credentials.password).first()
     if user:
-        # Authentication successful
-        return {'message': 'Login successful', 'email': user.Email}
+        return {'message': 'Login successful', 'email': user.StudentID}
     else:
-        # Authentication failed
         raise HTTPException(status_code=401, detail='Invalid credentials')
