@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
-from apps.login import app 
+from apps.login import app
 
 client = TestClient(app)
+
 
 def test_login_successful():
     response = client.post(
@@ -10,6 +11,7 @@ def test_login_successful():
     )
     assert response.status_code == 200
     assert response.json() == {"message": "Login successful", "email": "john@example.com"}
+
 
 def test_login_failed():
     response = client.post(
