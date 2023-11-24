@@ -15,7 +15,7 @@ class Student(Base):
 class Registration(Base):
     __tablename__ = "registration"
 
-    RegistrationID = Column(Integer, primary_key=True, index=True)
+    RegistrationID = Column(Integer, primary_key=True, index=True, autoincrement=True)
     StudentID = Column(Integer, index=True)
     EventID = Column(Integer, index=True)
 

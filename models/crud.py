@@ -17,7 +17,8 @@ def get_students(db: Session, skip: int = 0, limit: int = 100):
 
 def create_student(db: Session, student: schemas.StudentBase):
     # fake_hashed_password = student.password + "notreallyhashed"
-    db_student = models.Student(StudentID=student.StudentID, Name=student.Name, Email=student.Email, Password=student.Password)
+    db_student = models.Student(StudentID=student.StudentID, Name=student.Name, Email=student.Email,
+                                Password=student.Password)
     db.add(db_student)
     db.commit()
     db.refresh(db_student)
@@ -42,8 +43,21 @@ def get_event_registrations(db: Session, event_id: int):
     return None
 
 
+def get_event_registration(db: Session, event_id: int, student_email: str):
+    return (
+        db.query(models.Registration)
+        .join(models.Student, models.Registration.StudentID == models.Student.StudentID)
+        .filter(models.Registration.EventID == event_id, models.Student.Email == student_email)
+        .first()
+    )
+
+
 def get_events(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Event).offset(skip).limit(limit).all()
+
+
+def get_event(db: Session, event_id: int):
+    return db.query(models.Event).filter(models.Event.id == event_id).first()
 
 
 # def create_student_event(db: Session, Event: schemas.EventCreate, student_id: int):
@@ -63,3 +77,12 @@ def update_event(db: Session, event_id: int, event_update: schemas.EventUpdate):
         db.refresh(db_event)
         return db_event
     return None
+
+
+def create_registration_id(db: Session, student: schemas.StudentBase, event_id: int):
+    registration = models.Registration(EventID=event_id, StudentID=student.StudentID)
+    db.add(registration)
+    db.commit()
+    db.refresh(registration)
+
+    return registration

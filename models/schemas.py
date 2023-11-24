@@ -93,3 +93,12 @@ class StudentUpdate(StudentBase):
     Name: Optional[str]
     Email: Optional[str]
     Password: Optional[str]
+
+
+class RegistrationBase(BaseModel):
+    StudentID: int
+    EventID: int
+    RegistrationID: int
+
+    class Config:
+        orm_mode = True

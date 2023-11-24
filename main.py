@@ -1,6 +1,8 @@
+import models.models
 from models.models import Student
 from models.login_credentials import LoginCredentials
 from utilities.databases import *
+from models.models import Event
 from models import schemas, crud
 from fastapi import FastAPI, HTTPException, Depends, Request, Response
 
@@ -77,6 +79,14 @@ def read_events(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return events
 
 
+@app.get("/events/{event_id}", response_model=schemas.Event)
+def get_event(event_id: int, db: Session = Depends(get_db)):
+    event = crud.get_event(db=db, event_id=event_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return event
+
+
 @app.put("/events/{event_id}", response_model=schemas.EventUpdate)
 def update_event(event_id: int, event_update: schemas.EventUpdate, db: Session = Depends(get_db)):
     updated_event = crud.update_event(db=db, event_id=event_id, event_update=event_update)
@@ -87,7 +97,24 @@ def update_event(event_id: int, event_update: schemas.EventUpdate, db: Session =
 
 @app.get("/events/{event_id}/registrations/", response_model=list[schemas.EventBase])
 def get_event_registrations(event_id: int, db: Session = Depends(get_db)):
-    registrations = crud.get_event_registrations(db=db, event_id=event_id)
+    registrations = crud.get_event_regis.trations(db=db, event_id=event_id)
     if registrations is None:
         raise HTTPException(status_code=404, detail="Event not found")
     return registrations
+
+
+@app.post("/register/", response_model=schemas.RegistrationBase)
+async def register_for_event(event_id: int, student: schemas.StudentBase, db: Session = Depends(get_db)):
+    # Check if the event exists
+    db_event = crud.get_event(db=db, event_id=event_id)
+    if db_event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Check if the student already registered for the event
+    existing_registration = crud.get_event_registration(db=db, event_id=event_id, student_email=student.Email)
+    if existing_registration:
+        raise HTTPException(status_code=400, detail="Student already registered for this event")
+    # Register the student for the event
+    registration_id = crud.create_registration_id(db=db, student=student, event_id=event_id)
+
+    return registration_id
