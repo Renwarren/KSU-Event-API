@@ -66,7 +66,7 @@ for item in [event.__dict__ for event in events]:
         benefitNames, organizationId, institutionId, organizationIds, organizationProfilePicture, branchId, imagePath,
         visibility, status, searchScore))
     db.commit()
-    print("committed")
+    # print("committed")
 
 db.close()
 

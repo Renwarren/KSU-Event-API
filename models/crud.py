@@ -15,9 +15,9 @@ def get_students(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Student).offset(skip).limit(limit).all()
 
 
-def create_student(db: Session, student: schemas.StudentBase):
+def create_student(db: Session, student: schemas.StudentCreate):
     # fake_hashed_password = student.password + "notreallyhashed"
-    db_student = models.Student(StudentID=student.StudentID, Name=student.Name, Email=student.Email,
+    db_student = models.Student(Name=student.Name, Email=student.Email,
                                 Password=student.Password)
     db.add(db_student)
     db.commit()
@@ -37,18 +37,25 @@ def update_student(db: Session, student_id: int, student_update: schemas.Student
 
 
 def get_event_registrations(db: Session, event_id: int):
-    db_event = db.query(models.Event).filter(models.Event.id == event_id).first()
+    db_event = db.query(models.Registration).filter(models.Registration.EventID == event_id).all()
     if db_event:
-        return db_event.registrations
+        return db_event
     return None
 
 
 def get_event_registration(db: Session, event_id: int, student_email: str):
     return (
-        db.query(models.Registration)
-        .join(models.Student, models.Registration.StudentID == models.Student.StudentID)
+        db.query(models.Student)
+        .join(models.Registration, models.Registration.StudentID == models.Student.StudentID)
         .filter(models.Registration.EventID == event_id, models.Student.Email == student_email)
         .first()
+    )
+
+
+def get_all_registrations(db: Session):
+    return (
+        db.query(models.Registration)
+        .all()
     )
 
 
@@ -58,14 +65,6 @@ def get_events(db: Session, skip: int = 0, limit: int = 100):
 
 def get_event(db: Session, event_id: int):
     return db.query(models.Event).filter(models.Event.id == event_id).first()
-
-
-# def create_student_event(db: Session, Event: schemas.EventCreate, student_id: int):
-#     db_Event = models.Event(**Event.dict(), owner_id=student_id)
-#     db.add(db_Event)
-#     db.commit()
-#     db.refresh(db_Event)
-#     return db_Event
 
 
 def update_event(db: Session, event_id: int, event_update: schemas.EventUpdate):
@@ -79,7 +78,7 @@ def update_event(db: Session, event_id: int, event_update: schemas.EventUpdate):
     return None
 
 
-def create_registration_id(db: Session, student: schemas.StudentBase, event_id: int):
+def create_registration_id(db: Session, student: schemas.StudentReg, event_id: int):
     registration = models.Registration(EventID=event_id, StudentID=student.StudentID)
     db.add(registration)
     db.commit()

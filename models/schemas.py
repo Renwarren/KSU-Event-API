@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 from typing import Optional
 
 
@@ -70,15 +69,25 @@ class StudentBase(BaseModel):
         orm_mode = True
 
 
-class StudentCreate(StudentBase):
-    StudentID: Optional[int]
+class StudentCreate(BaseModel):
+    #StudentID: Optional[int]
     Name: Optional[str]
     Email: Optional[str]
     Password: Optional[str]
 
+    class Config:
+        orm_mode = True
 
-class Student(StudentBase):
-    pass
+
+class StudentReg(BaseModel):
+    StudentID: int
+    Email: str
+
+    # Email: str
+    # pass
+
+    class Config:
+        orm_mode = True
 
 
 class StudentEmail(StudentBase):
@@ -94,10 +103,13 @@ class StudentUpdate(StudentBase):
     Email: Optional[str]
     Password: Optional[str]
 
+    class Config:
+        orm_mode = True
+
 
 class RegistrationBase(BaseModel):
     StudentID: int
-    EventID: int
+    EventID: str
     RegistrationID: int
 
     class Config:
