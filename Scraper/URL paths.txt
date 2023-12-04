@@ -1,0 +1,2 @@
+Sample URL for images: https://se-images.campuslabs.com/clink/images/**********.jpg
+Sample GUID for ID: https://owllife.kennesaw.edu/event/*******
